@@ -1,0 +1,258 @@
+<!DOCTYPE HTML>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <link rel="stylesheet" type="text/css" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" th:href="@{/css/styles.css}">
+    <meta charset="utf-8">
+    <script src="https://code.jquery.com/jquery-3.4.1.js" integrity="sha256-WpOohJOqMqqyKL9FccASB9O0KwACQJpFTUBLTYOVvVU=" crossorigin="anonymous"></script>
+    <!--<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>-->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Open+Sans&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.0.0/animate.min.css"/>
+    <script src="https://kit.fontawesome.com/1d3592e294.js" crossorigin="anonymous"></script>
+    <title>Przepisowo - Strona główna</title>
+</head>
+<body>
+<nav class="navbar navbar-expand-lg text-white pl-4 pr-4 pt-5" role="navigation">
+    <a class="navbar-brand" href="/">📕 PRZEPISOWO</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="nav navbar-nav navbar-right ml-auto">
+            <li class="nav-item">
+                <a class="nav-link mr-3 p-3 text-white" href="/">🏠 STRONA GŁÓWNA</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link mr-3 p-3 text-white" href="/recipes">📝PRZEPISY</a>
+            </li>
+            <li class="nav-item" th:if="${session.role} == 'Moderator' and ${session.isLogin} == true">
+                <a class="nav-link mr-3 p-3 text-white mod-btn" href="/modPanel"><i class="fas fa-sign-in-alt"></i> MODERUJ </a>
+            </li>
+            <li class="nav-item" th:if="${session.isLogin} != true">
+                <button class="login-btn nav-link mr-3 p-3" data-toggle="modal" data-target="#loginModal"><i class="fas fa-sign-in-alt"></i> LOGOWANIE</button>
+            </li>
+            <li class="nav-item" th:if="${session.isLogin} != true">
+                <button class="register-btn nav-link mr-3 p-3" data-toggle="modal" data-target="#registerModal"><i class="fas fa-key"></i> REJESTRACJA</button>
+            </li>
+            <li class="nav-item" th:if="${session.isLogin} == true">
+                <button class="add-recipe-btn nav-link mr-3 p-3 animate__animated animate__infinite animate__pulse" data-toggle="modal" data-target="#addRecipeModal" ><i class="fas fa-carrot"></i> NOWY PRZEPIS</button>
+            </li>
+            <li class="nav-item" th:if="${session.isLogin} == true">
+                <form action="#" th:action="@{/logout}" method="post">
+                    <button type="submit" class="logout-btn btn nav-link mr-3 p-3" > <i class="fas fa-sign-out-alt"></i> WYLOGUJ</button>
+                </form>
+            </li>
+        </ul>
+    </div>
+</nav>
+<div class="container-fluid h-100">
+    <div class="row justify-content-center">
+        <div class="jumbotron jumbotron-fluid">
+            <div class="container-fluid">
+                <div class="container-fluid text-center">
+                <h1 class="display-4">PRZEPISY</h1>
+                    <hr class="header_underline">       
+                    <p>Sprawdź nasze najnowsze innowacje kulinarne!</p>
+                </div>
+            </div>    
+        </div>
+    </div>
+    <div class="row justify-content-center">
+        <div class="col-md-12 ">
+            <div class="row justify-content-center mb-5">
+                <form method="POST" th:action="@{/recipes/sortCategory}" action="#">
+                    <button type="submit" name="sort" id="sort" class="btn-filter">Sortuj Kategoria</button>
+                </form>
+                <form method="POST" th:action="@{/recipes/sortAuthor}" action="#">
+                    <button type="submit" name="sort" id="sort" class="btn-filter">Sortuj Autor</button>
+                </form>
+                <form method="POST" th:action="@{/recipes/sortLevel}" action="#">
+                    <button type="submit" name="sort" id="sort" class="btn-filter">Sortuj Ocena</button>
+                </form>
+            </div>
+        </div>
+        <div class="col-md-10">
+            <div class="container-body rounded">
+                <div class="row">
+                    <div class="grid" th:each="recipe: ${recipes1}">
+                        <div class="col-md-12 mb-4">
+                            <div class="card">
+                                <div class="card__image" th:each="image: ${images}" th:if="${recipe.id}==${image.recipes.id}">
+                                    <img th:src="@{${image.file_name}}" alt="">
+                                    <div class="card__overlay card__overlay--blue">
+                                        <div class="card__overlay-content">
+                                            <ul class="card__meta">
+                                                <li th:each="avg: ${avgs}" th:if="${avg.key} == ${recipe.id}">
+                                                    <span th:if="${avg.value} == 0">🏆 Brak Oceny</span>
+                                                    <span th:if="${avg.value} == 1">🏆⭐⭐</span>
+                                                    <span th:if="${avg.value} == 2">🏆⭐⭐</span>
+                                                    <span th:if="${avg.value} == 3">🏆⭐⭐⭐</span>
+                                                    <span th:if="${avg.value} == 4">🏆⭐⭐⭐⭐</span>
+                                                    <span th:if="${avg.value} == 5">🏆⭐⭐⭐⭐⭐</span>
+                                                </li>
+                                                <li>
+                                                    <span th:text="'⌚'+${recipe.prepare_time} + 'MIN'"><i class="fa fa-clock-o"></i></span>
+                                                </li>
+                                            </ul>
+
+                                            <a th:text="${recipe.name}" th:href="@{/recipe/{id}(id=${recipe.id})}" class="card__title"></a>
+
+                                            <ul class="card__meta card__meta--last" th:each="category: ${categories}" th:if="${category.id} ==  ${recipe.categories.id}">
+                                                <li><span th:each="user: ${users1}" th:if="${user.id} == ${recipe.user.id}" th:text="'🙍'+${user.nickname}"></span></li>
+                                                <li><span th:text="'🔍'+${category.name}"></span></li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<!-- Logowanie -->
+<div class="modal fade" id="loginModal" tabindex="-1" role="dialog" aria-labelledby="loginTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="loginTitle">Panel Logowania</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form action="#" th:action="@{/loginuser}" th:object="${users}" method="post">
+                    <div class="form-group">
+                        <label for="login">Login</label>
+                        <input type="text" th:field="*{login}" class="form-control"  id="login" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="pass">Password</label>
+                        <input type="password" th:field="*{password}" class="form-control" id="pass" required>
+                    </div>
+                    <div class="form-group text-center mt-5">
+                        <input type="submit" class="btn btn-lg btn-primary mx-auto" value="Zaloguj">
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Rejestracja -->
+<div class="modal fade" id="registerModal" tabindex="-1" role="dialog" aria-labelledby="registerTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="registerTitle">Panel Rejestracji</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form action="#" th:action="@{/adduser}" th:object="${users}" method="post">
+                    <div class="form-group">
+                        <label for="login">Nazwa wyświetlana</label>
+                        <input type="text" th:field="*{nickname}" class="form-control"  id="nickname" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="login">Login</label>
+                        <input type="text" th:field="*{login}" class="form-control"  id="login" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="pass">Password</label>
+                        <input type="password" th:field="*{password}" class="form-control" id="pass" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="rpass">Repeat Password</label>
+                        <input type="password" class="form-control" id="rpass" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="rpass">Email</label>
+                        <input type="email" th:field="*{email}" class="form-control" id="email" required>
+                    </div>
+                    <div class="form-group text-center mt-5">
+                        <input type="submit" class="btn btn-lg btn-primary mx-auto" value="Zarejestruj"></input>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="addRecipeModal" tabindex="-1" role="dialog" aria-labelledby="addRecipeTitle" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addRecipeTitle">Panel Dodawania Przepisu</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form action="#" enctype="multipart/form-data" method="post" th:action="@{/recipes}" th:object="${recipes}">
+                    <div class="form-group">
+                        <label for="recipe_name">Nazwa przepisu</label>
+                        <input type="text" th:field="*{name}" class="form-control"  id="recipe_name" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="category">Kategoria</label>
+                        <select class="form-control" id="category" th:field="*{categories.id}" required>
+                            <option th:each="category: ${categories}" th:value="${category.id}" th:text="${category.name}"></option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="category_new">W przypadku braku kategorii proszę wpisać nową</label>
+                        <input  class="form-control" type="text" id="category_new" name="category_new">
+                    </div>
+                    <div class="form-group">
+                        <label for="time">Czas przygotowania (w minutach)</label>
+                            <input type="text" class="form-control" id="time" th:field="*{prepare_time}" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="ingredients">Potrzebne składniki</label><br>
+                        <textarea cols=50% rows=10  class="form-control" id="ingredients" th:field="*{ingredients}" required></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="description">Opis wykonania</label><br>
+                        <textarea cols=50% rows=10 class="form-control" id="description" th:field="*{description}" required></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="img">Obrazek dania</label><br>
+                        <input class="form-control-file" type="file" id="img" name="img" accept="image/*" required>
+                    </div>
+                    <div class="form-group text-center mt-5">
+                        <button type="submit" class="btn btn-lg btn-primary mx-auto">Dodaj</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    var category_new = document.getElementById("category_new");
+    category_new.onchange = function () {
+        if (this.value != "" || this.value.length > 0) {
+            document.getElementById("category").disabled = true;
+        } else {
+            document.getElementById("category").disabled = false;
+        }
+    }
+
+    var category = document.getElementById("category");
+    category.onchange = function () {
+        if (this.value != "" || this.value.length > 0) {
+            document.getElementById("category_new").disabled = true;
+        } else {
+            document.getElementById("category_new").disabled = false;
+        }
+    }
+</script>
+</body>
+</html>

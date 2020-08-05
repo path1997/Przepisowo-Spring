@@ -1,0 +1,205 @@
+<!DOCTYPE HTML>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <link rel="stylesheet" type="text/css" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" th:href="@{/css/styles.css}">
+    <script th:src="@{/js/sweetalert.js}"></script>
+    <meta charset="utf-8">
+    <script src="https://code.jquery.com/jquery-3.4.1.js" integrity="sha256-WpOohJOqMqqyKL9FccASB9O0KwACQJpFTUBLTYOVvVU=" crossorigin="anonymous"></script>
+    <!--<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>-->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Open+Sans&display=swap" rel="stylesheet">
+    <script src="https://kit.fontawesome.com/1d3592e294.js" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.0.0/animate.min.css"/>
+    <title>Przepisowo - Strona główna</title>
+</head>
+<body>
+<nav class="navbar navbar-expand-lg text-white pl-4 pr-4 pt-5" role="navigation">
+    <a class="navbar-brand" href="/">📕 PRZEPISOWO</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="nav navbar-nav navbar-right ml-auto">
+            <li class="nav-item">
+                <a class="nav-link mr-3 p-3 text-white" href="/">🏠 STRONA GŁÓWNA</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link mr-3 p-3 text-white" href="/recipes">📝PRZEPISY</a>
+            </li>
+            <li class="nav-item" th:if="${session.isLogin} != true">
+                <button class="login-btn nav-link mr-3 p-3" data-toggle="modal" data-target="#loginModal"><i class="fas fa-sign-in-alt"></i> LOGOWANIE</button>
+            </li>
+            <li class="nav-item" th:if="${session.isLogin} != true">
+                <button class="register-btn nav-link mr-3 p-3" data-toggle="modal" data-target="#registerModal"><i class="fas fa-key"></i> REJESTRACJA</button>
+            </li>
+            <li class="nav-item" th:if="${session.isLogin} == true">
+                <form action="#" th:action="@{/logout}" method="post">
+                    <button type="submit" class="logout-btn btn nav-link mr-3 p-3" > <i class="fas fa-sign-out-alt"></i> WYLOGUJ</button>
+                </form>
+            </li>
+        </ul>
+    </div>
+</nav>
+<div class="container">
+    <h1 class="text-center text-white">Panel Moderatora</h1>
+    <div class="row panel-container mt-5 ">
+        <div class='col-md-8 mx-auto p-5 h-100 text-left'>
+            <button class="btn btn-lg d-block btn-primary mb-3" data-toggle="modal" data-target="#addCategoryModal">📝 DODAJ KATEGORIE</button>
+            <button class="btn btn-lg d-block btn-danger mb-3" data-toggle="modal" data-target="#deleteCategoryModal">🗑️ USUN KATEGORIE</button>
+            <button class="btn btn-lg d-block btn-warning mb-3" data-toggle="modal" data-target="#editRecipeModal">🖊️ EDYTUJ PRZEPIS</button>
+            <button class="btn btn-lg d-block btn-danger mb-3" data-toggle="modal" data-target="#deleteRecipeModal">🗑️ USUN PRZEPIS</button>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="editRecipeModal" tabindex="-1" role="dialog" aria-labelledby="editRecipeTitle" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editRecipeTitle">Panel Edycji Przepisu</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <select class="form-control" id="selectRecipe">
+                    <option id="0" selected>Wybierz przepis</option>
+                    <option th:each="recipe: ${recipes}" th:text="${recipe.name}" th:id="${recipe.id}"></option>
+                </select>
+                <form id="editForm" action="#" enctype="multipart/form-data" method="post" th:action="@{/modPanel/editRecipe}">
+                    <script type="text/javascript">
+                        $( document ).ready(function() {
+                            var mySelect = $('#selectRecipe');
+                            mySelect.on('change',function(){
+                                $("#editForm").html("");
+                                var id = $(this).children(":selected").attr("id");
+                                $.get('/findRecipe/'+id,function(e) {
+                                    console.log(e);
+                                    console.log(e[0]['name']);
+                                        var html = "";
+                                            html += "<div class=\"form-group\">\n" +
+                                                "<label for=\"recipe_name\">Nazwa przepisu</label>\n" +
+                                                "<input  type=\"text\" class=\"form-control\" name='recipe_name' id=\"recipe_name\" value='"+e[0]['name']+"'+ required>\n" +
+                                                "</div>\n" +
+                                                "<div class=\"form-group\">\n" +
+                                                "<label for=\"category\">Kategoria</label>\n" +
+                                                "<select class=\"form-control\" id=\"category\" name='category_id' required> \n ";
+                                                for(let i = 0; i < e[3].length; i++) {
+                                                    if(e[3][i]['name'] != e[1]['name'])
+                                                        html += "<option value='"+e[3][i]['id']+"'>" + e[3][i]['name'] + "</option>\n";
+                                                    else
+                                                        html+="<option selected  value='"+e[1]['id']+"'>"+e[1]['name']+"</option>\n";
+                                                }
+                                                html += "</select>\n" +
+                                                "</div>\n" +
+                                                "<div class=\"form-group\">\n" +
+                                                "<label for=\"time\">Czas przygotowania (w minutach)</label>\n" +
+                                                "<input type=\"text\" class=\"form-control\" name='prepare_time' value='"+e[0]['prepare_time']+"' + id=\"time\" required>\n" +
+                                                "</div>\n" +
+                                                "<div class=\"form-group\">\n" +
+                                                "<label for=\"ingredients\">Potrzebne składniki</label><br>\n" +
+                                                "<textarea cols=50% rows=10  class=\"form-control\" name='ingredients' id=\"ingredients\" required>"+e[0]['ingredients']+"</textarea>\n" +
+                                                "</div>\n" +
+                                                "<div class=\"form-group\">\n" +
+                                                "<label for=\"description\">Opis wykonania</label><br>\n" +
+                                                "<textarea cols=50% rows=10 class=\"form-control\" name='description' id=\"description\" required>"+e[0]['description']+"</textarea>\n" +
+                                                "</div>\n" +
+                                                "<div class=\"form-group\">\n" +
+                                                "<label for=\"img\">Obrazek dania</label><br>\n" +
+                                                "<img class='img-responsive img-fluid' src='"+e[2][0]['file_name']+"'>"+
+                                                "<input class=\"form-control-file mt-3\" type=\"file\" id=\"img\" name=\"img\" accept=\"image/*\">\n" +
+                                                "</div>\n" +
+                                                "<div class=\"form-group text-center mt-5\">\n" +
+                                                "<input type='hidden' name='recipe_id' value='"+e[0]['id']+"'>"+
+                                                    "<input type='hidden' name='photo_id' value='"+e[2][0]['id']+"'>"+
+                                                "<button type=\"submit\" class=\"btn btn-lg btn-warning mx-auto\">Edytuj</button>\n" +
+                                                "</div>";
+                                            console.log(html);
+                                            $("#editForm").append(html);
+                                });
+                            });
+                        });
+                    </script>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="deleteCategoryModal" tabindex="-1" role="dialog" aria-labelledby="deleteCategoryTitle" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="deleteCategoryTitle">Panel usuwania kategorii</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form action="#" th:action="@{/modPanel/deleteCategory}" method="POST">
+                    <select class="form-control" name="category_id">
+                        <option th:each="category: ${categories}" th:text="${category.name}" th:value="${category.id}" required></option>
+                    </select>
+                    <button type="submit" class="btn btn-lg btn-danger mt-3">Usuń</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="deleteRecipeModal" tabindex="-1" role="dialog" aria-labelledby="deleteRecipeTitle" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="deleteRecipeTitle">Panel Edycji Przepisu</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form action="#" th:action="@{/modPanel/deleteRecipe}" method="POST">
+                    <select class="form-control" name="recipe_id">
+                        <option th:each="recipe: ${recipes}" th:text="${recipe.name}" th:value="${recipe.id}" required></option>
+                    </select>
+                    <button type="submit" class="btn btn-lg btn-danger mt-3">Usuń</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="addCategoryModal" tabindex="-1" role="dialog" aria-labelledby="addCategoryTitle" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addCategoryTitle">Panel dodawania kategorii</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form action="#" th:action="@{/modPanel/addCategory}" method="POST">
+                    <input class="form-control" type="text" name="category_name" placeholder="Nazwa kategorii" required/>
+                    <button type="submit" class="btn btn-lg btn-success mt-3">Dodaj</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+
+    function showAlert(){
+        Swal.fire({
+            title: 'Błąd',
+            text: 'Do kategorii są przypisane przepisy. Usuń przepisy lub przepisz do innej kategorii.',
+            icon: 'error',
+            confirmButtonText: 'OK'
+        })
+    }
+
+</script>
+<div th:if="${warning}==true"><script> showAlert();</script></div>
+</body>
+</html>

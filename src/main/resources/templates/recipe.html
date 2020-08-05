@@ -1,0 +1,216 @@
+<!DOCTYPE HTML>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <link rel="stylesheet" type="text/css" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" th:href="@{/css/styles.css}">
+    <meta charset="utf-8">
+    <script src="https://code.jquery.com/jquery-3.4.1.js" integrity="sha256-WpOohJOqMqqyKL9FccASB9O0KwACQJpFTUBLTYOVvVU=" crossorigin="anonymous"></script>
+    <!--<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>-->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Open+Sans&display=swap" rel="stylesheet">
+    <script src="https://kit.fontawesome.com/1d3592e294.js" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.0.0/animate.min.css"/>
+    <title>Przepisowo - Strona główna</title>
+</head>
+<body>
+<nav class="navbar navbar-expand-lg text-white pl-4 pr-4 pt-5" role="navigation">
+    <a class="navbar-brand" href="/">📕 PRZEPISOWO</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="nav navbar-nav navbar-right ml-auto">
+            <li class="nav-item">
+                <a class="nav-link mr-3 p-3 text-white" href="/">🏠 STRONA GŁÓWNA</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link mr-3 p-3 text-white" href="/recipes">📝PRZEPISY</a>
+            </li>
+            <li class="nav-item" th:if="${session.role} == 'Moderator' and ${session.isLogin} == true">
+                <a class="nav-link mr-3 p-3 text-white mod-btn" href="/modPanel"><i class="fas fa-sign-in-alt"></i> MODERUJ </a>
+            </li>
+            <li class="nav-item" th:if="${session.isLogin} != true">
+                <button class="login-btn nav-link mr-3 p-3" data-toggle="modal" data-target="#loginModal"><i class="fas fa-sign-in-alt"></i> LOGOWANIE</button>
+            </li>
+            <li class="nav-item" th:if="${session.isLogin} != true">
+                <button class="register-btn nav-link mr-3 p-3" data-toggle="modal" data-target="#registerModal"><i class="fas fa-key"></i> REJESTRACJA</button>
+            </li>
+            <li class="nav-item" th:if="${session.isLogin} == true">
+                <form action="#" th:action="@{/logout}" method="post">
+                    <button type="submit" class="logout-btn btn nav-link mr-3 p-3" > <i class="fas fa-sign-out-alt"></i> WYLOGUJ</button>
+                </form>
+            </li>
+        </ul>
+    </div>
+</nav>
+<div class="container-fluid mt-5 p-0">
+    <div class="row justify-content-center">
+        <div th:each="recipe: ${recipes}" class="col-md-6 mt-5 pl-5 text-white text-center">
+            <h2 th:each="user: ${users}" th:if="${user.id} == ${recipe.user.id}" th:text="'🙍 Dodał: '+${user.nickname}" class="mt-5"></h2>
+            <h2 th:each="rating: ${rate}" th:if="${rating} == 1" class="mt-4">🏆 Ocena: ⭐</h2>
+            <h2 th:each="rating: ${rate}" th:if="${rating} == 2" class="mt-4">🏆 Ocena: ⭐⭐</h2>
+            <h2 th:each="rating: ${rate}" th:if="${rating} == 3" class="mt-4">🏆 Ocena: ⭐⭐⭐</h2>
+            <h2 th:each="rating: ${rate}" th:if="${rating} == 4" class="mt-4">🏆 Ocena: ⭐⭐⭐⭐</h2>
+            <h2 th:each="rating: ${rate}" th:if="${rating} == 5" class="mt-4">🏆 Ocena: ⭐⭐⭐⭐⭐</h2>
+            <h2 th:if="${recipe.level} == 1" class="mt-4">🌡️ Trudność: 🔥</h2>
+            <h2 th:if="${recipe.level} == 2" class="mt-4">🌡️ Trudność: 🔥🔥</h2>
+            <h2 th:if="${recipe.level} == 3" class="mt-4">🌡️ Trudność: 🔥🔥🔥</h2>
+            <h2 th:if="${recipe.level} == 4" class="mt-4">🌡️ Trudność: 🔥🔥🔥🔥</h2>
+            <h2 th:if="${recipe.level} == 5" class="mt-4">🌡️ Trudność: 🔥🔥🔥🔥🔥</h2>
+            <h2 th:text="'⌚ Czas: '+${recipe.prepare_time} +'MIN'"class="mt-4"></h2>
+            <h2 th:each="category: ${categories}" th:if="${category.id} == ${recipe.categories.id}" th:text="'🔍 Kategoria: '+${category.name}"class="mt-4"></h2>
+        </div>
+        <div th:each="recipe: ${recipes}"  class="col-md-6 p-0 justify-content-center">
+            <div class="recipe_jumbotron jumbotron jumbotron-fluid">
+                <div th:each="image: ${images}" th:if="${recipe.id}==${image.recipes.id}"  th:style="'background-image:url(./../'+@{${image.file_name}}+');'" class="bg"></div>
+                    <div class="container-fluid">
+                        <div class="recipe_header rounded container-fluid text-center">
+                            <h1 th:text="${recipe.name}"class="display-4"></h1>
+                            <hr class="header_underline w-50">
+                            <p>Smacznego 😊</p>
+                        </div>
+                    </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12 pr-0">
+            <div class="container-body rounded">
+                <div class="recipe bg-light">
+                    <div class="row p-5 m-0">
+                        <div class="col-md-4 text-justify">
+                            <h1 class="text-center">Organizacja</h1>
+                            <hr class="header_underline w-50">  
+                            <p th:each="recipe: ${recipes}" th:text="${recipe.ingredients}"></p>
+                        </div>
+                        <div class="col-md-4 text-justify">
+                            <h1 class="text-center">Wykonanie</h1>
+                            <hr class="header_underline w-50">  
+                            <p th:each="recipe: ${recipes}" th:text="${recipe.description}"> Jakieś tam wykonanie</p>
+                        </div>
+                        <div th:each="recipe: ${recipes}"  class="col-md-4 text-justify">
+                            <h1 class="text-center">Komentarze</h1>
+                            <hr class="header_underline w-50">
+                            <div th:each="commentarie: ${commentaries1}" class="commentarie">
+                                <p th:each="user: ${users2}" th:if="${user.id} == ${commentarie.users.id}" th:text="'🙍 Dodał: '+${user.nickname}"> </p>
+                                <p th:if="${recipe.id}==${commentarie.recipes.id}" th:text="${commentarie.description}"></p>
+                                <a th:if="${loggedUserId} == ${commentarie.users.id}" class="btn btn-danger btn-sm mb-3" th:href="@{/deleteComment/{idC}/{idR}(idC=${commentarie.id},idR=${recipe.id})}">Usuń</a>
+                            </div>
+                            <div class="form" th:if="${isLogin}==true">
+                                <form id="form" method="POST" action="#" th:action="@{/recipe/addCommentarie/{id}(id=${recipes.id})}" th:object="${commentaries}" th:if="${isMoreThan5}==false">
+                                    <div class="form-group">
+                                        <label for="description">Dodaj Komentarz:</label>
+                                        <textarea class="form-control" th:field="*{description}" value="" id="description" name="star"></textarea>
+                                    </div>
+                                    <div th:if="${isMoreThan5} == true">
+                                        <p>Limit komentarzy został osiągnięty</p>
+                                    </div>
+                                    <div class="form-group">
+                                        <button class="btn btn-success btn-primary" type="submit">Dodaj</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="rate" th:if="${isLogin}==true">
+    <h4 class="text-center">Twoja ocena</h4>
+    <div class="stars mx-auto">
+        <form  id="form-ratings" method="POST" action="#" th:action="@{/recipe/addRate/{id}(id=${recipes.id})}" th:object="${ratings}">
+            <input class="star" type="radio" th:field="*{rate}"  id="star5" name="star" value="5" onClick="submitForm()">
+            <label class="star-label" for="star5"></label>
+            <input class="star" type="radio" th:field="*{rate}"  id="star4" name="star" value="4" onClick="submitForm()">
+            <label class="star-label" for="star4"></label>
+            <input class="star" type="radio" th:field="*{rate}"  id="star3" name="star" value="3" onClick="submitForm()">
+            <label class="star-label" for="star3"></label>
+            <input class="star" type="radio" th:field="*{rate}"  id="star2" name="star" value="2" onClick="submitForm()">
+            <label class="star-label"  for="star2"></label>
+            <input class="star" type="radio" th:field="*{rate}"  id="star1" name="star" value="1" onClick="submitForm()">
+            <label class="star-label" for="star1"></label>
+        </form>
+    </div>
+</div>
+
+<!-- Logowanie -->
+<div class="modal fade" id="loginModal" tabindex="-1" role="dialog" aria-labelledby="loginTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="loginTitle">Panel Logowania</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form action="#" th:action="@{/loginuser}" th:object="${users}" method="post">
+                    <div class="form-group">
+                        <label for="login">Login</label>
+                        <input type="text" th:field="*{login}" class="form-control"  id="login" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="pass">Password</label>
+                        <input type="password" th:field="*{password}" class="form-control" id="pass" required>
+                    </div>
+                    <div class="form-group text-center mt-5">
+                        <input type="submit" class="btn btn-lg btn-primary mx-auto" value="Zaloguj">
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div class="modal fade" id="registerModal" tabindex="-1" role="dialog" aria-labelledby="registerTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="registerTitle">Panel Rejestracji</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form action="#" th:action="@{/adduser}" th:object="${users}" method="post">
+                    <div class="form-group">
+                        <label for="login">Nazwa wyświetlana</label>
+                        <input type="text" th:field="*{nickname}" class="form-control"  id="nickname" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="login">Login</label>
+                        <input type="text" th:field="*{login}" class="form-control"  id="login" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="pass">Password</label>
+                        <input type="password" th:field="*{password}" class="form-control" id="pass" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="rpass">Repeat Password</label>
+                        <input type="password" class="form-control" id="rpass" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="rpass">Email</label>
+                        <input type="email" th:field="*{email}" class="form-control" id="email" required>
+                    </div>
+                    <div class="form-group text-center mt-5">
+                        <input type="submit" class="btn btn-lg btn-primary mx-auto" value="Zarejestruj"></input>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    function submitForm(){
+        document.getElementById("form-ratings").submit();
+    }
+</script>
+</body>
+
+</html>
